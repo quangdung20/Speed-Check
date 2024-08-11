@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import socket
+import sqlite3
+from datetime import datetime
 
 # Server configuration
 HOST = '127.0.0.1'
@@ -36,6 +38,17 @@ def init():
         ax.legend(loc='upper left')
     return lines
 
+# Function to insert data into SQLite database
+def insert_data(timestamp, speed_real_right, speed_set_right, speed_real_left, speed_set_left):
+    conn = sqlite3.connect('speed_data.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO speed_data (time, speed_real_right, speed_set_right, speed_real_left, speed_set_left)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (timestamp, speed_real_right, speed_set_right, speed_real_left, speed_set_left))
+    conn.commit()
+    conn.close()
+
 # Function to update the plot
 def update(frame):
     try:
@@ -44,44 +57,33 @@ def update(frame):
             if ',' in data:
                 parent_parts = data.split(';')
                 for x in parent_parts:
-                    parts = x
+                    parts = x.split(',')
                     if len(parts) == 4:
-                        # Extracting data for each graph
-                        left_data1 = parts[0]  # Graph 1 (left)
-                        right_data1 = parts[1]  # Graph 2 (right)
-                        left_data2 = parts[2]  # Graph 3 (left)
-                        right_data2 = parts[3]  # Graph 4 (right)
+                        # Extract numeric values
+                        values = [float(value) for value in parts]
                         
-                        # if (left_data1.startswith('L') and right_data1.startswith('R') and
-                        #     left_data2.startswith('L') and right_data2.startswith('R')):
-
-                        try:
-                            # Extract numeric values
-                            # values = [float(x[1:]) for x in [left_data1, right_data1, left_data2, right_data2]]
+                        # Append new data to plot
+                        for i, value in enumerate(values):
+                            xdata[i].append(frame)
+                            ydata[i].append(value)
                             
+                            # Trim data to keep it within a visible range
+                            max_points = 100  # Number of data points to display at a time
+                            if len(xdata[i]) > max_points:
+                                xdata[i] = xdata[i][-max_points:]
+                                ydata[i] = ydata[i][-max_points:]
                             
-                            # Append new data
-                            for i, value in enumerate(values):
-                                xdata[i].append(frame)
-                                ydata[i].append(value)
-                                
-                                # Trim data to keep it within a visible range
-                                max_points = 100  # Number of data points to display at a time
-                                if len(xdata[i]) > max_points:
-                                    xdata[i] = xdata[i][-max_points:]
-                                    ydata[i] = ydata[i][-max_points:]
-                                
-                                lines[i].set_data(xdata[i], ydata[i])
-                            
-                            # Update x and y limits
-                            for ax in axs:
-                                if len(xdata[0]) > 0:
-                                    ax.set_xlim(xdata[0][0], xdata[0][-1] + 1)
+                            lines[i].set_data(xdata[i], ydata[i])
+                        
+                        # Insert data into the database
+                        timestamp = datetime.now()  # Capture current timestamp
+                        insert_data(timestamp, values[0], values[1], values[2], values[3])
+                        
+                        # Update x and y limits
+                        for ax in axs:
+                            if len(xdata[0]) > 0:
+                                ax.set_xlim(xdata[0][0], xdata[0][-1] + 1)
                                     
-                        except ValueError:
-                            print("Error converting data to float:", data)
-                        else:
-                            print("Received data does not match expected format:", data)
                     else:
                         print("Unexpected number of values:", data)
             else:

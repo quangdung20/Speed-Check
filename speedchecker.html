@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Data Charts</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+            color: #555;
+        }
+
+        input[type="datetime-local"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        canvas {
+            width: 100%;
+            height: 400px;
+            margin-top: 30px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            button {
+                font-size: 14px;
+            }
+
+            input[type="datetime-local"] {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Speed Data Charts</h1>
+        <div class="form-group">
+            <label for="start_time">Start Time:</label>
+            <input type="datetime-local" id="start_time" step="1">
+        </div>
+        <div class="form-group">
+            <label for="end_time">End Time:</label>
+            <input type="datetime-local" id="end_time" step="1">
+        </div>
+        <button onclick="fetchData()">Get Data</button>
+
+        <canvas id="chartRight"></canvas>
+        
+        <canvas id="chartLeft"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function fetchData() {
+            const startTime = document.getElementById('start_time').value;
+            const endTime = document.getElementById('end_time').value;
+
+            fetch(`http://localhost:3000/api/speed_data?start_time=${startTime}&end_time=${endTime}`)
+                .then(response => response.json())
+                .then(data => {
+                    const times = data.map(d => new Date(d.time).toLocaleString());
+                    const speedRealRight = data.map(d => d.speed_real_right);
+                    const speedSetRight = data.map(d => d.speed_set_right);
+                    const speedRealLeft = data.map(d => d.speed_real_left);
+                    const speedSetLeft = data.map(d => d.speed_set_left);
+
+                    new Chart(document.getElementById('chartRight').getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: times,
+                            datasets: [
+                                { label: 'Speed Real Right', data: speedRealRight, borderColor: 'blue', fill: false },
+                                { label: 'Speed Set Right', data: speedSetRight, borderColor: 'red', fill: false }
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                x: { title: { display: true, text: 'Time' } },
+                                y: { title: { display: true, text: 'Speed' } }
+                            }
+                        }
+                    });
+
+                    new Chart(document.getElementById('chartLeft').getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: times,
+                            datasets: [
+                                { label: 'Speed Real Left', data: speedRealLeft, borderColor: 'green', fill: false },
+                                { label: 'Speed Set Left', data: speedSetLeft, borderColor: 'orange', fill: false }
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                x: { title: { display: true, text: 'Time' } },
+                                y: { title: { display: true, text: 'Speed' } }
+                            }
+                        }
+                    });
+                });
+        }
+    </script>
+</body>
+
+</html>

@@ -56,15 +56,54 @@ https://codepen.io/ng-ngc-sn-the-bashful/pen/dyovNrP?editors=1100
 
 
 Auto add row>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <style>
+        table {
+            width: 100%;
+            
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+            height: 1px;
+        }
+
+        thead tr{
+            position: relative;
+            top: 0;
+            border-collapse: collapse;
+            
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
 
 <body>
     <div id="search-results">
-        <table>
+        <table id="dataTable">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Gen</th>
+                    <th>Dia chi</th>
+                    <th>Toa</th>
+                    <th>Phong</th>
+                    <th>Phone</th>
+
                 </tr>
             </thead>
             <tbody id="results-body">
@@ -74,30 +113,56 @@ Auto add row>
     </div>
 
     <script>
-        // Mô phỏng dữ liệu từ cơ sở dữ liệu
-        const allResults = [
-            { id: 1, name: 'John Doe', email: 'john@example.com' },
-            { id: 2, name: 'Jane Doe', email: 'jane@example.com' },
-            { id: 3, name: 'Alice Smith', email: 'alice@example.com' },
-            // ... thêm các kết quả khác ở đây
+        const data = [
+            { id: 1, name: "John Doe", age: 30 },
+            { id: 2, name: "Jane Smith", age: 25 },
+            { id: 3, name: "David Johnson", age: 35 }
         ];
 
-        function loadResults() {
-            const resultsBody = document.getElementById('results-body');
-            allResults.forEach(result => {
+        const tbody = document.querySelector('#dataTable tbody');
+
+        // Hàm thêm hàng vào bảng
+        function loadTableData(data) {
+            data.forEach(item => {
                 const row = document.createElement('tr');
-                row.innerHTML = `
-         <td>${result.id}</td>
-         <td>${result.name}</td>
-         <td>${result.email}</td>
-        `;
-                resultsBody.appendChild(row);
+
+                // Thêm ô checkbox
+                const checkboxCell = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = item.id;
+                checkboxCell.appendChild(checkbox);
+                row.appendChild(checkboxCell);
+
+                // Thêm các ô dữ liệu khác
+                Object.values(item).forEach(text => {
+                    const cell = document.createElement('td');
+                    const cellText = document.createTextNode(text);
+                    cell.appendChild(cellText);
+                    row.appendChild(cell);
+                });
+
+                tbody.appendChild(row);
             });
         }
 
-        // Tải tất cả kết quả ngay khi trang được load
-        loadResults();
+        // Hàm xoá các hàng được chọn
+        function deleteSelectedRows() {
+            const checkboxes = document.querySelectorAll('#dataTable tbody input[type="checkbox"]:checked');
+            checkboxes.forEach(checkbox => {
+                const row = checkbox.parentElement.parentElement;
+                tbody.removeChild(row);
+            });
+        }
+
+        // Gọi hàm để load dữ liệu vào bảng
+        loadTableData(data);
+
+        // Gán sự kiện click cho nút xoá
+        document.getElementById('deleteButton').addEventListener('click', deleteSelectedRows);
     </script>
 </body>
+
+</html>
 
 </html>

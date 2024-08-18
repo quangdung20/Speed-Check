@@ -1,0 +1,103 @@
+Note:
+Extention.
+Evondev - HTML to CSS
+Evondev snippets
+Highlight Matching Tag
+Htmltagwrap
+IntelliSense for CSS class
+Auto Rename Tag
+Babel Javascript
+Bookmarks
+DotENV
+ESLint
+
+Javascript (ES6) code snippets
+Prettier
+Reactjs code snippets
+styled-components-snippets
+Tailwind CSS IntelliSense
+Turbo Console Log
+Visual Studio IntelliCode
+vscode-styled-components
+
+Setting.json
+{
+"editor.defaultFormatter": "esbenp.prettier-vscode",
+"editor.inlineSuggest.enabled": true,
+"editor.formatOnSave": true,
+"typescript.updateImportsOnFileMove.enabled": "always",
+"emmet.includeLanguages": {
+"javascript": "javascriptreact",
+"vue-html": "html"
+},
+"emmet.triggerExpansionOnTab": true,
+"[javascript]": {
+"editor.defaultFormatter": "esbenp.prettier-vscode"
+},
+"javascript.updateImportsOnFileMove.enabled": "always",
+"eslint.alwaysShowStatus": true,
+"[jsonc]": {
+"editor.defaultFormatter": "esbenp.prettier-vscode"
+}
+}
+
+Web template UI:
+https://collectui.com/challenges/checkout
+
+Source code custom reponsive:
+https://codepen.io/ng-ngc-sn-the-bashful/pen/dyovNrP?editors=1100
+
+
+
+
+
+
+
+
+
+Auto add row>
+
+<body>
+    <div id="search-results">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody id="results-body">
+                <!-- Kết quả tìm kiếm sẽ hiển thị ở đây -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Mô phỏng dữ liệu từ cơ sở dữ liệu
+        const allResults = [
+            { id: 1, name: 'John Doe', email: 'john@example.com' },
+            { id: 2, name: 'Jane Doe', email: 'jane@example.com' },
+            { id: 3, name: 'Alice Smith', email: 'alice@example.com' },
+            // ... thêm các kết quả khác ở đây
+        ];
+
+        function loadResults() {
+            const resultsBody = document.getElementById('results-body');
+            allResults.forEach(result => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+         <td>${result.id}</td>
+         <td>${result.name}</td>
+         <td>${result.email}</td>
+        `;
+                resultsBody.appendChild(row);
+            });
+        }
+
+        // Tải tất cả kết quả ngay khi trang được load
+        loadResults();
+    </script>
+</body>
+
+</html>
